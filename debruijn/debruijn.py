@@ -27,9 +27,9 @@ import textwrap
 import matplotlib.pyplot as plt
 matplotlib.use("Agg")
 
-__author__ = "Your Name"
+__author__ = "BAILLIF Marine"
 __copyright__ = "Universite Paris Diderot"
-__credits__ = ["Your Name"]
+__credits__ = ["Marine BAILLIF"]
 __license__ = "GPL"
 __version__ = "1.0.0"
 __maintainer__ = "Your Name"
@@ -81,7 +81,13 @@ def read_fastq(fastq_file):
     :param fastq_file: (str) Path to the fastq file.
     :return: A generator object that iterate the read sequences. 
     """
+    with open(fastq_file,"r") as fastq : 
+        for ligne in fastq :
+            yield next(fastq).strip()
+            next(fastq)
+            next(fastq)
     pass
+
 
 
 def cut_kmer(read, kmer_size):
@@ -90,7 +96,10 @@ def cut_kmer(read, kmer_size):
     :param read: (str) Sequence of a read.
     :return: A generator object that iterate the kmers of of size kmer_size.
     """
+    for i in range(len(read) - (kmer_size-1)):
+        yield (read[i:i+kmer_size])
     pass
+
 
 
 def build_kmer_dict(fastq_file, kmer_size):
@@ -99,6 +108,22 @@ def build_kmer_dict(fastq_file, kmer_size):
     :param fastq_file: (str) Path to the fastq file.
     :return: A dictionnary object that identify all kmer occurrences.
     """
+    list_seq = list(read_fastq(fastq_file))
+    list_read = []
+    for i in range(len(list_seq)):
+        sequence = list_seq[i]
+        list_kmer = list(cut_kmer(sequence, kmer_size))
+        list_read.append(list_kmer)
+        #list_read.append(list_kmer)
+    print(list_read)
+    dico_kmer = {}
+    for i in range(len(list_read)):
+        for kmer in list_read[i]:
+            if kmer in dico_kmer:
+                dico_kmer[kmer] += 1
+            else:
+                dico_kmer[kmer] = 1
+    return(dico_kmer)
     pass
 
 
@@ -108,7 +133,22 @@ def build_graph(kmer_dict):
     :param kmer_dict: A dictionnary object that identify all kmer occurrences.
     :return: A directed graph (nx) of all kmer substring and weight (occurrence).
     """
+    G=nx.DiGraph()
+    for kmer in kmer_dict:
+        kmer_all= kmer
+        
+        kmer_start = kmer_all[:-1]
+        kmer_end = kmer_all[1:]
+        
+        if kmer_start not in G:
+            G.add_node(kmer_start)
+        if kmer_end not in G:
+            G.add_node(kmer_end)
+        
+        G.add_edge(kmer_start,kmer_end,weight=kmer_dict[kmer_all])
+    return G
     pass
+
 
 
 def remove_paths(graph, path_list, delete_entry_node, delete_sink_node):
@@ -248,6 +288,10 @@ def main(): # pragma: no cover
     """
     # Get arguments
     args = get_arguments()
+    diko_kmer = build_kmer_dict("eva71_two_reads.fq", 3)
+    #print(diko_kmer)
+
+    graph_kmer = print(build_graph(diko_kmer))
 
     # Fonctions de dessin du graphe
     # A decommenter si vous souhaitez visualiser un petit 
@@ -259,3 +303,13 @@ def main(): # pragma: no cover
 
 if __name__ == '__main__': # pragma: no cover
     main()
+
+# read fastq
+#mon_generateur = list(read_fastq("eva71_two_reads.fq"))
+#for i in mon_generateur : 
+    #print(i)
+
+# cut kmer 
+#generateur2 = cut_kmer(mon_generateur[0],3)
+#for i in generateur2 : 
+    #print(i)
