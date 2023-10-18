@@ -277,24 +277,11 @@ def get_contigs(graph, starting_nodes, ending_nodes):
             if nx.has_path(graph, node_start, node_end) == True : 
                 print("list_seq")
                 liste_seq = list(nx.all_simple_paths(graph, node_start,node_end))
-            #print("contig")
                 for liste in liste_seq : 
                     seq = liste[0]
                     for mini_seq in liste[1:] :
                         seq = seq + mini_seq[-1]
-                    #print((seq,len(seq)))
                     list_contig.append((seq,len(seq)))
-                
-            #if len(liste_seq) != 0:
-                #seq = liste_seq[0]
-                #print(f"seq {seq}")
-                #for mini_seq in liste_seq :
-                    #print("mini_seq") 
-                    #print(mini_seq)
-                    #print(mini_seq[-1])
-                   #seq =  seq + mini_seq[-1]
-                #list_contig.append((seq,len(seq)))
-    print(list_contig)
     return list_contig
     pass
 
@@ -304,6 +291,19 @@ def save_contigs(contigs_list, output_file):
     :param contig_list: (list) List of [contiguous sequence and their length]
     :param output_file: (str) Path to the output file
     """
+    with open(output_file, "w") as fasta_file:
+        for i, (contig, length) in enumerate(contigs_list):
+            header = f">contig_{i} len={length}\n"
+            wrapped_sequence = textwrap.fill(contig, width=80)
+            fasta_file.write(header + wrapped_sequence + "\n")
+
+    #with open(output_file,"w") as fasta_file : 
+        #for contig in contigs_list : 
+            #fasta_file.write(f"> contig length {contig[1]}\n".encode('utf-8'))
+            #fasta_file.write(f"{contig[0]}\n".encode('utf-8'))
+            #fasta_file.write(f">contig lenght {contig[1]}\n")
+            #fasta_file.write(f"{contig[0]}\n")
+    
     pass
 
 
@@ -353,6 +353,9 @@ def main(): # pragma: no cover
 
     # contig 
     contig = get_contigs(graph_kmer,list_predecessor,list_sucessor)
+
+    # save_contigs(contigs_list, output_file)
+    save_contigs(contig, "contig.fasta")
 
     # Fonctions de dessin du graphe
     # A decommenter si vous souhaitez visualiser un petit 
