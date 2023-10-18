@@ -271,11 +271,31 @@ def get_contigs(graph, starting_nodes, ending_nodes):
     :param ending_nodes: (list) A list of nodes without successors
     :return: (list) List of [contiguous sequence and their length]
     """
+    list_contig = []
     for node_start in starting_nodes:
         for node_end in ending_nodes:
-            liste_seq = list(nx.all_simple_paths(graph, node_start,node_end))
-            print("contig")
-            print(liste_seq)
+            if nx.has_path(graph, node_start, node_end) == True : 
+                print("list_seq")
+                liste_seq = list(nx.all_simple_paths(graph, node_start,node_end))
+            #print("contig")
+                for liste in liste_seq : 
+                    seq = liste[0]
+                    for mini_seq in liste[1:] :
+                        seq = seq + mini_seq[-1]
+                    #print((seq,len(seq)))
+                    list_contig.append((seq,len(seq)))
+                
+            #if len(liste_seq) != 0:
+                #seq = liste_seq[0]
+                #print(f"seq {seq}")
+                #for mini_seq in liste_seq :
+                    #print("mini_seq") 
+                    #print(mini_seq)
+                    #print(mini_seq[-1])
+                   #seq =  seq + mini_seq[-1]
+                #list_contig.append((seq,len(seq)))
+    print(list_contig)
+    return list_contig
     pass
 
 def save_contigs(contigs_list, output_file):
