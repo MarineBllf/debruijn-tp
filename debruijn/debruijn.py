@@ -115,7 +115,8 @@ def build_kmer_dict(fastq_file, kmer_size):
         list_kmer = list(cut_kmer(sequence, kmer_size))
         list_read.append(list_kmer)
         #list_read.append(list_kmer)
-    print(list_read)
+    
+    #print(list_read)
     dico_kmer = {}
     for i in range(len(list_read)):
         for kmer in list_read[i]:
@@ -227,6 +228,22 @@ def get_starting_nodes(graph):
     :param graph: (nx.DiGraph) A directed graph object
     :return: (list) A list of all nodes without predecessors
     """
+    #list_no_pred = []
+    #for node in graph : 
+    #    print(node)
+    #    pred_nod = list(nx.predecessor(graph, node))
+    #    if len(pred_nod) == 0 :
+    #        list_no_pred.append(pred_nod)
+    #return list_no_pred
+
+    nodes = graph.nodes()
+    list_no_pred = []
+
+    for node in nodes:
+        pred_node=list(graph.predecessors(node))
+        if len(pred_node)==0:
+            list_no_pred.append(node)
+    return list_no_pred
     pass
 
 def get_sink_nodes(graph):
@@ -235,6 +252,15 @@ def get_sink_nodes(graph):
     :param graph: (nx.DiGraph) A directed graph object
     :return: (list) A list of all nodes without successors
     """
+
+    nodes = graph.nodes()
+    list_no_succ = []
+
+    for node in nodes:
+        success_node = list(graph.successors(node))
+        if len(success_node)==0:
+            list_no_succ.append(node)
+    return list_no_succ
     pass
 
 def get_contigs(graph, starting_nodes, ending_nodes):
@@ -245,6 +271,11 @@ def get_contigs(graph, starting_nodes, ending_nodes):
     :param ending_nodes: (list) A list of nodes without successors
     :return: (list) List of [contiguous sequence and their length]
     """
+    for node_start in starting_nodes:
+        for node_end in ending_nodes:
+            liste_seq = list(nx.all_simple_paths(graph, node_start,node_end))
+            print("contig")
+            print(liste_seq)
     pass
 
 def save_contigs(contigs_list, output_file):
@@ -288,10 +319,20 @@ def main(): # pragma: no cover
     """
     # Get arguments
     args = get_arguments()
-    diko_kmer = build_kmer_dict("eva71_two_reads.fq", 3)
+    diko_kmer = build_kmer_dict("eva71_two_reads.fq",22)
     #print(diko_kmer)
 
-    graph_kmer = print(build_graph(diko_kmer))
+    graph_kmer = build_graph(diko_kmer)
+
+    list_predecessor = get_starting_nodes(graph_kmer)
+    #print(list_predecessor)
+
+    #sucessor
+    list_sucessor = get_sink_nodes(graph_kmer)
+    #print(list_sucessor)
+
+    # contig 
+    contig = get_contigs(graph_kmer,list_predecessor,list_sucessor)
 
     # Fonctions de dessin du graphe
     # A decommenter si vous souhaitez visualiser un petit 
