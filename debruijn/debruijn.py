@@ -485,13 +485,3 @@ def main(): # pragma: no cover
 
 if __name__ == '__main__': # pragma: no cover
     main()
-
-# read fastq
-#mon_generateur = list(read_fastq("eva71_two_reads.fq"))
-#for i in mon_generateur : 
-    #print(i)
-
-# cut kmer 
-#generateur2 = cut_kmer(mon_generateur[0],3)
-#for i in generateur2 : 
-    #print(i)
