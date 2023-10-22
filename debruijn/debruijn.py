@@ -86,7 +86,6 @@ def read_fastq(fastq_file):
             yield next(fastq).strip()
             next(fastq)
             next(fastq)
-    pass
 
 
 
@@ -98,7 +97,6 @@ def cut_kmer(read, kmer_size):
     """
     for i in range(len(read) - (kmer_size-1)):
         yield (read[i:i+kmer_size])
-    pass
 
 
 
@@ -116,7 +114,6 @@ def build_kmer_dict(fastq_file, kmer_size):
         list_read.append(list_kmer)
         #list_read.append(list_kmer)
     
-    #print(list_read)
     dico_kmer = {}
     for i in range(len(list_read)):
         for kmer in list_read[i]:
@@ -125,7 +122,6 @@ def build_kmer_dict(fastq_file, kmer_size):
             else:
                 dico_kmer[kmer] = 1
     return(dico_kmer)
-    pass
 
 
 def build_graph(kmer_dict):
@@ -148,9 +144,6 @@ def build_graph(kmer_dict):
         
         G.add_edge(kmer_start,kmer_end,weight=kmer_dict[kmer_all])
     return G
-    pass
-
-import networkx as nx
 
 
 
@@ -184,7 +177,6 @@ def remove_paths(graph, path_list, delete_entry_node, delete_sink_node):
             graph2.remove_nodes_from(nodes_to_remove)
 
     return graph2
-    pass
 
 
 def select_best_path(graph, path_list, path_length, weight_avg_list, 
@@ -227,8 +219,6 @@ def select_best_path(graph, path_list, path_length, weight_avg_list,
     graph = remove_paths(graph,path_list,delete_entry_node,delete_sink_node) 
     return(graph)
 
-    pass
-
 def path_average_weight(graph, path):
     """Compute the weight of a path
 
@@ -260,7 +250,6 @@ def solve_bubble(graph, ancestor_node, descendant_node):
 
     return(best_graph)
 
-    pass
 
 def simplify_bubbles(graph):
     """Detect and explode bubbles
@@ -287,7 +276,6 @@ def simplify_bubbles(graph):
     if bubble_flag:
         graphe = simplify_bubbles(solve_bubble(graph,noeud_ancêtre, node))
     return graphe
-    pass
 
 def solve_entry_tips(graph, starting_nodes):
     """Remove entry tips
@@ -346,7 +334,6 @@ def solve_out_tips(graph, ending_nodes):
             graph = solve_entry_tips(select_best_path(graph,paths,len_paths,av_weigts,False,True,),ending_nodes)
             break
     return(graph)
-    pass
 
 def get_starting_nodes(graph):
     """Get nodes without predecessors
@@ -363,7 +350,6 @@ def get_starting_nodes(graph):
         if len(pred_node)==0:
             list_no_pred.append(node)
     return list_no_pred
-    pass
 
 def get_sink_nodes(graph):
     """Get nodes without successors
@@ -380,7 +366,6 @@ def get_sink_nodes(graph):
         if len(success_node)==0:
             list_no_succ.append(node)
     return list_no_succ
-    pass
 
 def get_contigs(graph, starting_nodes, ending_nodes):
     """Extract the contigs from the graph
@@ -394,7 +379,6 @@ def get_contigs(graph, starting_nodes, ending_nodes):
     for node_start in starting_nodes:
         for node_end in ending_nodes:
             if nx.has_path(graph, node_start, node_end) == True : 
-                print("list_seq")
                 liste_seq = list(nx.all_simple_paths(graph, node_start,node_end))
                 for liste in liste_seq : 
                     seq = liste[0]
@@ -402,7 +386,6 @@ def get_contigs(graph, starting_nodes, ending_nodes):
                         seq = seq + mini_seq[-1]
                     list_contig.append((seq,len(seq)))
     return list_contig
-    pass
 
 def save_contigs(contigs_list, output_file):
     """Write all contigs in fasta format
@@ -416,14 +399,8 @@ def save_contigs(contigs_list, output_file):
             wrapped_sequence = textwrap.fill(contig, width=80)
             fasta_file.write(header + wrapped_sequence + "\n")
 
-    #with open(output_file,"w") as fasta_file : 
-        #for contig in contigs_list : 
-            #fasta_file.write(f"> contig length {contig[1]}\n".encode('utf-8'))
-            #fasta_file.write(f"{contig[0]}\n".encode('utf-8'))
-            #fasta_file.write(f">contig lenght {contig[1]}\n")
-            #fasta_file.write(f"{contig[0]}\n")
+
     
-    pass
 
 
 def draw_graph(graph, graphimg_file): # pragma: no cover
@@ -434,18 +411,14 @@ def draw_graph(graph, graphimg_file): # pragma: no cover
     """                                   
     fig, ax = plt.subplots()
     elarge = [(u, v) for (u, v, d) in graph.edges(data=True) if d['weight'] > 3]
-    #print(elarge)
     esmall = [(u, v) for (u, v, d) in graph.edges(data=True) if d['weight'] <= 3]
-    #print(elarge)
-    # Draw the graph with networkx
-    #pos=nx.spring_layout(graph)
+  
     pos = nx.random_layout(graph)
     nx.draw_networkx_nodes(graph, pos, node_size=6)
     nx.draw_networkx_edges(graph, pos, edgelist=elarge, width=6)
     nx.draw_networkx_edges(graph, pos, edgelist=esmall, width=6, alpha=0.5, 
                            edge_color='b', style='dashed')
-    #nx.draw_networkx(graph, pos, node_size=10, with_labels=False)
-    # save image
+
     plt.savefig(graphimg_file)
 
 
